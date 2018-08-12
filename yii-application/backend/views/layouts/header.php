@@ -26,7 +26,7 @@ use yii\helpers\Html;
                         <span class="label label-success">4</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">blablabla</li>
+                        <li class="header">email´s</li>
                         <li>
                             <!-- inner menu: contains the actual data -->
                             <ul class="menu">

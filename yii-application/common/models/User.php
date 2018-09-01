@@ -10,13 +10,6 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\web\IdentityInterface;
-use yii\helpers\ArrayHelper;
-use common\models\Rol;
-use common\models\Estado;
-use common\models\TipoUsuario;
-use common\models\Perfil;
-use yii\helpers\Html;
-use yii\helpers\Url;
 /*use yii\helpers\Security;
 
 /**
@@ -104,16 +97,7 @@ class User extends ActiveRecord implements IdentityInterface
            /*ATRIBUTO-----VALIDADOR---PARAMETROS Y CONDICIONES*/ 
             ['estado_id', 'default', 'value' => self::ESTADO_ACTIVO],
             
-            //regla que solo permite los valores 1,2 devueltos por getEstadoLista()
-            [['estado_id'],'in', 'range'=>array_keys($this->getEstadoLista())],
-            
             ['rol_id', 'default', 'value' => 1],
-            
-            //regla que solo permite los valores 1,2 devueltos por getRolLista()
-            [['rol_id'],'in', 'range'=>array_keys($this->getRolLista())],
-            
-            //regla que solo permite los valores 1,2 devueltos por getTipoUsuarioLista()
-            [['tipo_usuario_id'],'in', 'range'=>array_keys($this->getTipoUsuarioLista())], 
             
             ['tipo_usuario_id', 'default', 'value' => 1],
             
@@ -148,15 +132,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             
             /* Sus otras etiquetas de atributo */
-            'rolNombre' => Yii::t('app', 'Rol'), 
-            'estadoNombre' => Yii::t('app', 'Estado'), 
-            'perfilId' => Yii::t('app', 'Perfil'), 
-            'perfilLink' => Yii::t('app', 'Perfil'), 
-            'userLink' => Yii::t('app', 'User'), 
-            'username' => Yii::t('app', 'User'), 
-            'tipoUsuarioNombre' => Yii::t('app', 'Tipo Usuario'), 
-            'tipoUsuarioId' => Yii::t('app', 'Tipo Usuario'), 
-            'userIdLink' => Yii::t('app', 'ID'),
+            
         ];
         
     }   
@@ -355,207 +331,5 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
         
     }
-    
-    /**
-     * metodo para relacionar la tabla Perfil con la tabla Usuario
-     * 
-     * 1 usuario ------> 1 perfil
-     * 
-     * 1  perfil ------> 1 usuario
-     */
-    
-    public function getPerfil(){
-        
-        // el 'user_id' de la tabla Perfil está relacionado directamente con el 'id' de la tabla User
-        return $this->hasOne(Perfil::classname(), ['user_id' => 'id']);
-    }
-    
-    /**
-     * metodo para relacionar la tabla Rol con la tabla Usuario
-     *
-     * 1 usuario ------> 1 rol
-     *
-     * 1 rol ------> N usuarios
-     */
-    
-    public function getRol(){
-        
-        // el 'user_id' de la tabla Perfil está relacionado directamente con el 'id' de la tabla User
-        return $this->hasOne(Rol::classname(), ['id' => 'rol_id']);
-    }
-    
-    /**
-     * metodo para devolver el nombre del Rol que tiene un usuario
-     *
-     * Operador ternario para ver si a ese usuario se le a asignado un rol,
-     * y si es así que nos devuelva el nombre del rol que tiene o si no la cadena -sin rol-
-     */
-    
-    public function getRolNombre(){
-        
-        // no devuelve el nombre del rol que tiene este user, y si no tiene...nos devuelve '-sin rol-'
-        return $this->rol ? $this->rol->rol_nombre : '-sin rol-';
-    }
-    
-    /**
-     * metodo para devolver los dos tipos de roles y tenerlos en un array (para el desplegable del formulario)
-     *
-     * Lista de roles para Lista desplegable
-     */
-    
-    public function getRolLista(){
-        
-        //creamos la variable local $opciones y le asignamos una instancia de Rol, 
-        //con todos los registros que son devueltos como un array.
-        $opciones = Rol::find()->asArray()->all();
-        
-        //usamos el método ArrayHelper::map para listar los valores y nombres de rol.
-        return ArrayHelper::map($opciones, 'id', 'rol_nombre');
-    }
-    
-    /**
-     * metodo para relacionar la tabla Estado con la tabla Usuario
-     *
-     * 1 usuario ------> 1 estado
-     *
-     * 1 estado ------> N usuarios
-     */
-    
-    public function getEstado(){
-        
-        // el 'estado_id' de la tabla User está relacionado directamente con el 'id' de la tabla Estado
-        return $this->hasOne(Estado::classname(), ['id' => 'estado_id']);
-    }
-    
-    /**
-     * metodo para devolver el nombre del Estado que tiene un usuario
-     *
-     * Operador ternario para ver si a ese usuario se le a asignado un estado,
-     * y si es así que nos devuelva el nombre del estado que tiene o si no la cadena -sin estado-
-     */
-    
-    public function getEstadoNombre(){
-        
-        // no devuelve el nombre del estado que tiene este user, y si no tiene...nos devuelve '-sin estado-'
-        return $this->estado ? $this->estado->estado_nombre : '-sin estado-';
-    }
-    
-    /**
-     * metodo para devolver los tipos de estado y tenerlos en un array (para el desplegable del formulario)
-     *
-     * Lista de estados para Lista desplegable
-     */
-    
-    public function getEstadoLista(){
-        
-        //creamos la variable local $opciones y le asignamos una instancia de estado,
-        //con todos los registros que son devueltos como un array.
-        $opciones = Estado::find()->asArray()->all();
-        
-        //usamos el método ArrayHelper::map para listar los valores y nombres de estado.
-        return ArrayHelper::map($opciones, 'id', 'estado_nombre');
-    }
-    
-    /**
-     * metodo para relacionar la tabla TipoUsuario con la tabla Usuario
-     *
-     * 1 usuario ------> 1 tipo usuario
-     *
-     * 1 tipo usuario ------> N usuarios
-     */
-    
-    public function getTipoUsuario(){
-        
-        // el 'tipo_usuario_id' de la tabla User está relacionado directamente con el 'id' de la tabla TipoUsuario
-        return $this->hasOne(TipoUsuario::classname(), ['id' => 'tipo_usuario_id']);
-    }
-    
-    /**
-     * metodo para devolver el nombre del TipoUsuario que tiene un usuario
-     *
-     * Operador ternario para ver si a ese usuario se le a asignado un tipoUsuario,
-     * y si es así que nos devuelva el nombre del estado que tiene o si no la cadena -sin tipo usuario-
-     */
-    
-    public function getTipoUsuarioNombre(){
-        
-        // no devuelve el nombre del TipoUsuario que tiene este user, y si no tiene...nos devuelve '-sin tipo usuario-'
-        return $this->tipoUsuario ? $this->tipoUsuario->tipo_usuario_nombre : '-sin tipo usuario-';
-    }
-    
-    /**
-     * metodo para devolver los tipos de usuario y tenerlos en un array (para el desplegable del formulario)
-     *
-     * Lista de estados para Lista desplegable
-     */
-    
-    public function getTipoUsuarioLista(){
-        
-        //creamos la variable local $opciones y le asignamos una instancia de TipoUsuario,
-        //con todos los registros que son devueltos como un array.
-        $opciones = TipoUsuario::find()->asArray()->all();
-        
-        //usamos el método ArrayHelper::map para listar los valores y nombres de tipoUsuario.
-        return ArrayHelper::map($opciones, 'id', 'tipo_usuario_nombre');
-    }
-    
-    /**
-     * metodo para  retornar la id del registro del TipoUsuario
-     *
-     * Operador ternario para ver si a ese usuario se le a asignado un tipoUsuarioid,
-     * 
-     */
-    
-    public function getTipoUsuarioId(){
-        
-        // no devuelve el nombre del TipoUsuario que tiene este user, y si no tiene...nos devuelve '-sin tipo usuario-'
-        return $this->tipoUsuario ? $this->tipoUsuario->id : '-ninguno-';
-    }
-    
-    /**
-     * metodo para  retornar la id del registro del Perfil
-     *
-     * Operador ternario para ver si a ese usuario se le a asignado un Perfil,
-     *
-     */
-    
-    public function getPerfilId(){
-        
-        // no devuelve el nombre del Perfil que tiene este user, y si no tiene...nos devuelve '-ninguno-'
-        return $this->perfil ? $this->perfil->id : '-ninguno-';
-    }
-    
-    /** 
-     * @getPerfilLink 
-     * 
-     */
-    public function getPerfilLink() { 
-        $url = Url::to(['perfil/view', 'id'=>$this->perfilId]); 
-        $opciones = []; 
-        return Html::a($this->perfil ? 'perfil' : 'ninguno', $url, $opciones); 
-    }
-    
-    /** 
-     * get user id Link 
-     * 
-     */
-    public function getUserIdLink() 
-    { 
-        $url = Url::to(['user/update', 'id'=>$this->id]); 
-        $opciones = []; 
-        return Html::a($this->id, $url, $opciones); 
-    }
-    
-    /** 
-     * @get User Link 
-     *
-     */
-    public function getUserLink() { 
-        
-        $url = Url::to(['user/view', 'id'=>$this->id]); 
-        $opciones = []; 
-        return Html::a($this->username, $url, $opciones); 
-    }
-    
     
 } 

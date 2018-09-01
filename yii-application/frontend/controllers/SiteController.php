@@ -154,7 +154,6 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
                 if (Yii::$app->getUser()->login($user)) {
-                    //si encontramos al usuario y podemos iniciar sesion..goHome
                     return $this->goHome();
                 }
             }
